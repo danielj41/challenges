@@ -2,9 +2,9 @@
 
 Sometimes I convince myself to write convoluted code for fun.
 
-* [coin-change](#coin-change)
-* [compose](#compose)
-* [readme](#readme)
+* [coin-change](#user-content-coin-change)
+* [compose](#user-content-compose)
+* [readme](#user-content-readme)
 ## coin-change
 
 Solve the [change-making problem](https://en.wikipedia.org/wiki/Change-making_problem) with js.

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-find * -name README.md                   \
-  | xargs -n 1 head -n 1                 \
-  | sed s/^\#/\*/                        \
-  | sed 's/\* \(.*\)$/\* \[\1\]\(#\1\)/' \
-  | cat - */README.md                    \
-  | sed s/^\#/\#\#/                      \
-  | cat readme/intro.md -                \
+find * -name README.md                                \
+  | xargs -n 1 head -n 1                              \
+  | sed s/^\#/\*/                                     \
+  | sed 's/\* \(.*\)$/\* \[\1\]\(#user-content-\1\)/' \
+  | cat - */README.md                                 \
+  | sed s/^\#/\#\#/                                   \
+  | cat readme/intro.md -                             \
   > README.md
