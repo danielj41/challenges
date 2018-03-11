@@ -1,57 +1,54 @@
 console.log(((
   yComb,
   lift,
-  withState,
   memoize,
   bind,
-  run,
 ) =>
     ((
       coinChange,
     ) =>
       
-      run({}, bind(
-        withState(() => ({ total: 100, coins: [22, 14, 7, 5, 1] })),
+      
+      bind(
+        lift({ total: 100, coins: [22, 7, 5, 1] }),
         coinChange,
-      ))
+      )({})
 
     )(
       yComb(coinChange =>
         memoize(
-          ({state, value: { total, coins }}) => total === 0 ? lift([]) :
+          ({ total, coins }) => total === 0 ? lift([]) :
 
             ((
               findBest
             ) =>
 
-
-                findBest({
-                  state,
-                  value: {
+                bind(
+                  lift({
                     loopCoins: coins.filter(coinAmount => coinAmount <= total),
                     best: null
-                  }
-                })
+                  }),
+                  findBest
+                )
 
 
             )(
-              yComb(findBest => ({state, value: { loopCoins, best }}) => loopCoins.length === 0 ? lift(best) :
-                run(state,
-                  bind(
-                    withState(() => ({ total: total - loopCoins[0], coins })),
-                  bind(
+              yComb(findBest => ({ loopCoins, best }) => loopCoins.length === 0 ? lift(best) :
+                  bind(bind(bind(
+                    lift({ total: total - loopCoins[0], coins }),
                     coinChange,
-                  bind(
-                    withState((cur) => ({
+                  ),
+                    cur => lift({
                       loopCoins: loopCoins.slice(1),
                       best: best === null || (cur !== null && cur.length + 1 < best.length) ?
                               [loopCoins[0], ...cur]
                             :
                               best
-                    })),
+                    }),
+                  ),
                     findBest
-                  )))
-                )
+                  )
+                
               )
             )
 
@@ -65,26 +62,22 @@ console.log(((
 )(
   f => (x => f(y => x(x)(y)))(x => f(y => x(x)(y))),
 
-  value => ({ value, state: {} }),
+  value => state => [value, {}],
 
-  f => ({ value, state }) => ({ value: f(value), state: {} }),
-
-  f => ({ value, state }) =>
+  f => value => state =>
     (key =>
       key in state ?
-        { value: state[key], state: {} }
-        :
-        (({ value: valF, state }) =>
-           ({ value: valF, state: {[key]: valF, ...state} })
-        )(f({ value, state} ))
+          [state[key], {}]
+        : 
+        (([valueF, stateF]) =>
+           [valueF, {[key]: valueF, ...stateF}]
+        )(f(value)(state))
     )(JSON.stringify(value)),
 
-  (f, g) => ({ value, state }) => 
-    (({ value: valF, state: stateF }) =>
-      (({ value: valG, state: stateG }) => 
-        ({ value: valG, state: {...state, ...stateF, ...stateG} })
-      )(g({ value: valF, state: { ...state, ...stateF } })) 
-    )(f({ value, state })),
-
-  (initial, fn) => fn({ value: null, state: initial }),
+  (f, g) => state => 
+    (([ valueF, stateF ]) =>
+      (([ valueG, stateG ]) =>
+        [valueG, {...state, ...stateF, ...stateG}]
+      )(g(valueF)({...state, ...stateF})) 
+    )(f(state))
 ))
