@@ -1,6 +1,6 @@
 # compose
 
-Write `compose` in C.
+Write a generic `compose` in C.
 
 Sample `compose` in js:
 
